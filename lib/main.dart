@@ -19,21 +19,22 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: getProviders(),
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Task 1',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const MyHomePage(title: 'Flutter Demo Home Page'),
+        home: const MyHomePage(),
       ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+/// this home page
 
-  final String title;
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -59,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: const Text("Task 1"),
         ),
+        /// we are using api provider to notify fetched data
         body: Consumer<ApiProvider>(builder: (context, data, _) {
           if (data.loading && data.list.isEmpty) {
             return const Loader();
@@ -120,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             vlcPlayerController,
                                       ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 10,
                               ),
                               Expanded(
@@ -140,7 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         child: Text(
                                           '${e.firstName} ${e.lastName ?? ''}',
                                           overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.w700,
                                               fontSize: 16),
                                         ),
@@ -160,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   .withOpacity(0.5)),
                                         ),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 100,
                                       ),
                                       SizedBox(
@@ -248,21 +250,19 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   onNotification: (v) {
                     data.currentIndex = getCurrentItem;
-                    print(
-                        "bool:${v.metrics.maxScrollExtent == v.metrics.pixels}");
-                    print("max:${v.metrics.maxScrollExtent}");
-                    print("pix:${v.metrics.pixels}");
-                    print("pos:$getCurrentItem");
-                    print("len:${data.list.length}");
+
+                    /// here we are checking scrolling to fetch next page data
                     if (v.metrics.pixels >=
                         max((v.metrics.maxScrollExtent - 5 * 256),
                             v.metrics.maxScrollExtent)) {
+                      /// data.init() will fetch next page data
                       data.init();
                     }
                     return false;
                   },
                 ),
               ),
+
               if (data.loading && data.lastItemsCount > 0) const Loader()
             ],
           );
@@ -273,6 +273,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ((scrollController.position.pixels) / (256 + 32)).round();
 }
 
+/// This is special widget to show video view by using
+/// Vlc Player which is free and open source flutter
+/// plugin loads video faster than most of other plugins
 class VideoView extends StatefulWidget {
   final String url;
   final VlcPlayerOptions? options;
@@ -302,6 +305,7 @@ class _VideoViewState extends State<VideoView> {
     return widget.play
         ? WillPopScope(
             onWillPop: () async {
+              /// new screen will be navigated to play video in full screen
               Provider.of<ApiProvider>(context, listen: false).play = false;
               return true;
             },
@@ -321,6 +325,7 @@ class _VideoViewState extends State<VideoView> {
             controller: widget.vlcPlayerController!, aspectRatio: 9 / 16);
   }
 
+  /// to free up space disposeVlc() is made
   @override
   void dispose() {
     disposeVlc();
@@ -333,6 +338,7 @@ class _VideoViewState extends State<VideoView> {
     widget.vlcPlayerController = null;
   }
 
+  /// Initialization of Vlc Player
   init() async {
     if (widget.vlcPlayerController != null) {
       await disposeVlc();
@@ -342,6 +348,7 @@ class _VideoViewState extends State<VideoView> {
   }
 }
 
+/// Special Package (loading_indicator) is used to show user attracting progress bar (Loader)
 class Loader extends StatelessWidget {
   const Loader({
     super.key,

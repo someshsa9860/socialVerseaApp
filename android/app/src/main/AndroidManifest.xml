@@ -7,7 +7,8 @@
 
 
    <application
-        android:label="videoplayer"
+        android:label="Task 1"
+
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

@@ -1,16 +1,9 @@
-# videoplayer
+[//]: # (socialverseapp)
 
-A new Flutter project.
+[//]: # (This project is developed to show list of video in scrolling list which can pre-load faster in )
+[//]: # (scrolling as well as fast load in actual playing)
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+[//]: # (Here I used Open source Vlc Player Flutter plugin which loads video faster and having multiple options)
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+[//]: # (Thank You for spending your taking time)

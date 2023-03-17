@@ -7,6 +7,9 @@ import 'package:videoplayer/models/posts.dart';
 import 'package:videoplayer/utils/api.dart';
 
 class ApiProvider extends ChangeNotifier {
+
+  /// Posts model is used to set/get data
+
   final List<Posts> _list = [];
 
   bool _loading = false;
@@ -45,6 +48,7 @@ class ApiProvider extends ChangeNotifier {
   }
 
   init() async {
+    /// if already fetching in progress then no further request sent
     if ((lastItemsCount == 0 && page != 1) || loading) {
       return;
     }
@@ -54,6 +58,7 @@ class ApiProvider extends ChangeNotifier {
       notifyListeners();
     }
     if(!await fetch()){
+      /// User is offline
       Fluttertoast.showToast(msg: 'please connect internet');
     }
   }
@@ -63,6 +68,8 @@ class ApiProvider extends ChangeNotifier {
       final res = await CallApi.getData('/feed', body: {
         'page': [page.toString()]
       });
+
+      /// Here we used 250 max as positive code because some time its 201 or 200
       if (res.statusCode <= 250) {
         final body = jsonDecode(res.body);
 
@@ -73,9 +80,15 @@ class ApiProvider extends ChangeNotifier {
         page++;
         notifyListeners();
         return true;
+      }else{
+        ///Server Error
       }
+
+
     } catch (e) {
       // return await fetch();
+      /// If user is offline then this method will called again after 2sec
+
       Future.delayed(const Duration(seconds: 2)).whenComplete(() {
         return fetch();
       });
