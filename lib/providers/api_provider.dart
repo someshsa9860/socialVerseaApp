@@ -3,16 +3,39 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:videoplayer/models/api_model.dart';
+import 'package:videoplayer/models/posts.dart';
 import 'package:videoplayer/utils/api.dart';
 
 class ApiProvider extends ChangeNotifier {
-  final List<ApiModel> _list = [];
+  final List<Posts> _list = [];
 
-  bool _loading=false;
+  bool _loading = false;
 
-  List<ApiModel> get list => [..._list];
+  int _currentIndex=0;
+
+  bool _play=false;
+
+
+  bool get play => _play;
+
+  set play(bool value) {
+    _play = value;
+    notifyListeners();
+  }
+
+  int get currentIndex => _currentIndex;
+
+  set currentIndex(int value) {
+    if(value==_currentIndex) return;
+    _currentIndex = value;
+    notifyListeners();
+  }
+
+  List<Posts> get list => [..._list];
 
   int page = 1;
+
+  int lastItemsCount = 0;
 
   bool get loading => _loading;
 
@@ -22,22 +45,41 @@ class ApiProvider extends ChangeNotifier {
   }
 
   init() async {
-    _loading=true;
-    try{
-      final res = await CallApi.getData('/feed', body: {'page': page});
+    if ((lastItemsCount == 0 && page != 1) || loading) {
+      return;
+    }
+
+    _loading = true;
+    if (list.isNotEmpty) {
+      notifyListeners();
+    }
+    if(!await fetch()){
+      Fluttertoast.showToast(msg: 'please connect internet');
+    }
+  }
+
+  fetch() async {
+    try {
+      final res = await CallApi.getData('/feed', body: {
+        'page': [page.toString()]
+      });
       if (res.statusCode <= 250) {
         final body = jsonDecode(res.body);
 
-        _list.add(ApiModel.fromJson(body));
-
-        if(body['page_size']>0){
-          // page++;
-          // init();
-        }
+        final apiModel = (ApiModel.fromJson(body));
+        lastItemsCount = apiModel.pageSize ?? 0;
+        _list.addAll(apiModel.posts ?? []);
+        _loading = false;
+        page++;
+        notifyListeners();
+        return true;
       }
-    }catch(e){
-      Fluttertoast.showToast(msg: e.toString());
+    } catch (e) {
+      // return await fetch();
+      Future.delayed(const Duration(seconds: 2)).whenComplete(() {
+        return fetch();
+      });
     }
-    loading=false;
+    return false;
   }
 }
